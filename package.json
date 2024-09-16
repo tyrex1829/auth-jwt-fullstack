@@ -9,6 +9,7 @@
   "author": "tyrex",
   "license": "ISC",
   "dependencies": {
+    "commander": "^12.1.0",
     "express": "^4.21.0"
   }
 }
