@@ -7,11 +7,12 @@ const port = 3000;
 let users = [];
 
 app.use(express.json());
+app.use(express.static("./public"));
 
 const JWT_SECRET = "USER_APP";
 
 app.get("/", (req, res) => {
-  res.send("landing page");
+  res.sendFile("index.html");
 });
 
 app.post("/signing-up", (req, res) => {
@@ -83,7 +84,7 @@ function auth(req, res, next) {
   }
 }
 
-app.get("/me", (req, res) => {
+app.get("/me", auth, (req, res) => {
   const user = req.user;
 
   res.send({
