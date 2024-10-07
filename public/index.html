@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Auth Fullstack</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.7.7/axios.min.js"></script>
+  </head>
+  <body>
+    <div>
+      Signup
+      <input
+        id="signup-username"
+        type="text"
+        name="username"
+        placeholder="Username"
+      />
+      <input
+        id="signup-password"
+        type="password"
+        name="password"
+        placeholder="Password"
+      />
+      <button onclick="signup()">Submit</button>
+    </div>
+
+    <div>
+      Signin
+      <input
+        id="signin-username"
+        type="text"
+        name="username"
+        placeholder="Username"
+      />
+      <input
+        id="signin-password"
+        type="password"
+        name="password"
+        placeholder="Password"
+      />
+      <button onclick="signin()">Submit</button>
+    </div>
+
+    <div>
+      User information:
+      <div id="information"></div>
+    </div>
+
+    <div>
+      <button onclick="logout()">Logout</button>
+    </div>
+
+    <script>
+      async function signup() {
+        try {
+          const username = document.querySelector("#signup-username").value;
+          const password = document.querySelector("#signup-password").value;
+
+          const response = await axios.post(
+            "http://localhost:3000/signing-up",
+            {
+              username: username,
+              password: password,
+            }
+          );
+          alert("Successfully signed up!");
+        } catch (error) {
+          console.error("Signup error:", error);
+        }
+      }
+
+      async function signin() {
+        try {
+          const username = document.querySelector("#signin-username").value;
+          const password = document.querySelector("#signin-password").value;
+
+          const response = await axios.post(
+            "http://localhost:3000/signing-in",
+            {
+              username: username,
+              password: password,
+            }
+          );
+
+          localStorage.setItem("token", response.data.token);
+
+          alert("Signed in successfully!");
+        } catch (error) {
+          console.error("Signin error:", error);
+        }
+      }
+
+      async function getUserInformation() {
+        const token = localStorage.getItem("token");
+
+        if (token) {
+          try {
+            const response = await axios.get("http://localhost:3000/me", {
+              headers: {
+                Authorization: `${token}`,
+              },
+            });
+
+            document.querySelector(
+              "#information"
+            ).innerHTML = `Username: ${response.data.username}`;
+          } catch (error) {
+            console.error("Error fetching user information:", error);
+          }
+        } else {
+          document.querySelector(
+            "#information"
+          ).innerHTML = `No user information available.`;
+        }
+      }
+
+      getUserInformation();
+
+      async function logout() {
+        localStorage.removeItem("token");
+      }
+    </script>
+  </body>
+</html>
