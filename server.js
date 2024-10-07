@@ -62,22 +62,33 @@ app.post("/signing-in", (req, res) => {
   }
 });
 
-app.get("/me", (req, res) => {
+function auth(req, res, next) {
   const token = req.headers.authorization;
-  const userDetails = jwt.verify(token, JWT_SECRET);
-  const username = userDetails.username;
 
-  const user = users.find((u) => u.username === username);
-
-  if (user) {
-    res.send({
-      username: user.username,
+  if (token) {
+    jwt.verify(token, JWT_SECRET, (err, decoded) => {
+      if (err) {
+        res.status(401).send({
+          message: "Unauthorized",
+        });
+      } else {
+        req.user = decoded;
+        next();
+      }
     });
   } else {
     res.status(401).send({
       message: "Unauthorized",
     });
   }
+}
+
+app.get("/me", (req, res) => {
+  const user = req.user;
+
+  res.send({
+    username: user.username,
+  });
 });
 
 app.listen(port, () => {
