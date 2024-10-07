@@ -1,4 +1,5 @@
 import express from "express";
+import jwt from "jsonwebtoken";
 
 const app = express();
 const port = 3000;
@@ -7,9 +8,7 @@ let users = [];
 
 app.use(express.json());
 
-function generateRandomToken() {
-  return "&x" + Math.floor(Math.random() * 1000000) + 1 + "x" + "@0";
-}
+const JWT_SECRET = "USER_APP";
 
 app.get("/", (req, res) => {
   res.send("landing page");
@@ -45,7 +44,12 @@ app.post("/signing-in", (req, res) => {
   );
 
   if (user) {
-    const token = generateRandomToken();
+    const token = jwt.sign(
+      {
+        username: user.username,
+      },
+      JWT_SECRET
+    );
     user.token = token;
     res.send({
       token,
@@ -60,7 +64,10 @@ app.post("/signing-in", (req, res) => {
 
 app.get("/me", (req, res) => {
   const token = req.headers.authorization;
-  const user = users.find((u) => u.token === token);
+  const userDetails = jwt.verify(token, JWT_SECRET);
+  const username = userDetails.username;
+
+  const user = users.find((u) => u.username === username);
 
   if (user) {
     res.send({
