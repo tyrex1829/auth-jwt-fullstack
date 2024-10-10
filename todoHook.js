@@ -40,6 +40,37 @@ app.post("/signup", (req, res) => {
   res.send("Successfully Signed up!");
 });
 
+app.get("/signin", (req, res) => {
+  res.sendFile(path.join(__dirname, "public", "signin.html"));
+});
+
+app.post("/signin", (req, res) => {
+  const username = req.body.username;
+  const password = req.body.password;
+
+  const user = user.find(
+    (u) => u.username === username && u.password === password
+  );
+
+  if (user) {
+    const token = jwt.sign(
+      {
+        username: user.username,
+      },
+      JWT_SECRET
+    );
+    user.token = token;
+    res.send({
+      token,
+    });
+    console.log(users);
+  } else {
+    res.status(403).send({
+      message: "Invalid Username or Password",
+    });
+  }
+});
+
 app.listen(port, () => {
   console.log(`Server is running on http://localhost:${port}`);
 });
