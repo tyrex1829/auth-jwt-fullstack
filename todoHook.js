@@ -26,18 +26,19 @@ app.post("/signup", (req, res) => {
   const password = req.body.password;
 
   if (users.find((u) => u.username === username)) {
-    alert("already signed up as a user!");
-    res.json({
-      message: "Already a user",
+    return res.status(400).json({
+      message: "User already exists",
     });
-    return;
   }
+
   users.push({
     username: username,
     password: password,
   });
 
-  res.send("Successfully Signed up!");
+  res.status(201).json({
+    message: "Successfully signed up",
+  });
 });
 
 app.get("/signin", (req, res) => {

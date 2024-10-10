@@ -6,13 +6,24 @@ async function signup() {
     const username = document.querySelector("#signup-username").value;
     const password = document.querySelector("#signup-password").value;
 
+    if (!username || !password) {
+      alert("Please enter both a username and a password.");
+      return;
+    }
+
     const response = await axios.post("http://localhost:3001/signup", {
       username: username,
       password: password,
     });
-    alert("Successfully Signed up!");
+    if (response.status === 201) {
+      alert("Successfully Signed up!");
+      window.location.href = "/signin";
+    }
   } catch (error) {
     console.error("Signup error:", error);
+    alert(
+      "Signup failed: " + error.response.data.message || "An error occurred"
+    );
   }
 }
 
@@ -27,11 +38,18 @@ async function signin() {
       password: password,
     });
 
-    localStorage.setItem("token", response.data.token);
+    if (response.status === 200) {
+      localStorage.setItem("token", response.data.token);
+      alert("Signed in successfully!");
 
-    alert("Signed in successful");
-    getUserInformation();
+      getUserInformation();
+    } else {
+      alert("Sign-in failed: " + response.data.message);
+    }
   } catch (error) {
     console.error("Signin error:", error);
+    alert(
+      "An error occurred during sign-in. Please check your credentials and try again."
+    );
   }
 }
