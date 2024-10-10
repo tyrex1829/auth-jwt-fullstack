@@ -2,6 +2,7 @@ import express from "express";
 import path from "path";
 import { fileURLToPath } from "url";
 import jwt from "jsonwebtoken";
+import cors from "cors";
 
 const app = express();
 const port = 3001;
@@ -12,6 +13,15 @@ const JWT_SECRET = "Tyrex_TodoHook_app";
 app.use(express.json());
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
+
+app.use(express.static(path.join(__dirname, "public")));
+
+app.use(
+  cors({
+    origin: "*", // Allow requests from any origin
+    allowedHeaders: ["Content-Type", "Authorization"], // Allow Authorization header
+  })
+);
 
 app.get("/", (req, res) => {
   res.sendFile(path.join(__dirname, "public", "landing.html"));
@@ -49,7 +59,7 @@ app.post("/signin", (req, res) => {
   const username = req.body.username;
   const password = req.body.password;
 
-  const user = user.find(
+  const user = users.find(
     (u) => u.username === username && u.password === password
   );
 
@@ -61,8 +71,8 @@ app.post("/signin", (req, res) => {
       JWT_SECRET
     );
     user.token = token;
-    res.send({
-      token,
+    res.status(200).json({
+      token, // Return the token
     });
     console.log(users);
   } else {
@@ -75,10 +85,11 @@ app.post("/signin", (req, res) => {
 function auth(req, res, next) {
   const token = req.headers.authorization;
 
+  console.log("Authorization Header:", token);
   if (token) {
-    jwt.verify(token, "JWT_SECRET", (err, decoded) => {
+    jwt.verify(token, JWT_SECRET, (err, decoded) => {
       if (err) {
-        res.status(401).send({
+        res.status(401).json({
           message: "Unauthorized",
         });
       } else {
@@ -87,8 +98,8 @@ function auth(req, res, next) {
       }
     });
   } else {
-    res.status(401).send({
-      message: "Unauthorized",
+    res.status(401).json({
+      message: "unauthorized",
     });
   }
 }

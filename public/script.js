@@ -1,5 +1,3 @@
-import axios from "axios";
-
 // signup function
 async function signup() {
   try {
@@ -38,14 +36,9 @@ async function signin() {
       password: password,
     });
 
-    if (response.status === 200) {
-      localStorage.setItem("token", response.data.token);
-      alert("Signed in successfully!");
-      window.location.href = "/me";
-      getUserInformation();
-    } else {
-      alert("Sign-in failed: " + response.data.message);
-    }
+    localStorage.setItem("token", response.data.token);
+    alert("Signed in successfully!");
+    window.location.href = "/me";
   } catch (error) {
     console.error("Signin error:", error);
     alert(
@@ -62,19 +55,26 @@ async function getUserInformation() {
     try {
       const response = await axios.get("http://localhost:3001/me", {
         headers: {
-          Authorization: token,
+          Authorization: `${token}`,
         },
       });
       document.querySelector(
         "#information"
-      ).innerHTML = ` ${response.data.username}`;
+      ).innerHTML = ` Hello ${response.data.username}`;
     } catch (error) {
-      console.error("Error fetching user information:", error);
+      if (error.response && error.response.status === 401) {
+        // If Unauthorized, redirect to signin page
+        alert("Session expired or unauthorized. Please sign in again.");
+        window.location.href = "/signin"; // Redirect to signin page
+      } else {
+        console.error("Error fetching user information:", error);
+        alert("Failed to fetch user information.");
+      }
     }
   } else {
-    document.querySelector(
-      "#information"
-    ).innerHTML = `No user information available.`;
+    // If no token found, redirect to signin page
+    alert("No valid session found. Please sign in.");
+    window.location.href = "/signin"; // Redirect to signin page
   }
 }
 
