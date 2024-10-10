@@ -41,7 +41,7 @@ async function signin() {
     if (response.status === 200) {
       localStorage.setItem("token", response.data.token);
       alert("Signed in successfully!");
-
+      window.location.href = "/me";
       getUserInformation();
     } else {
       alert("Sign-in failed: " + response.data.message);
@@ -52,4 +52,35 @@ async function signin() {
       "An error occurred during sign-in. Please check your credentials and try again."
     );
   }
+}
+
+// Details of user
+async function getUserInformation() {
+  const token = localStorage.getItem("token");
+
+  if (token) {
+    try {
+      const response = await axios.get("http://localhost:3001/me", {
+        headers: {
+          Authorization: token,
+        },
+      });
+      document.querySelector(
+        "#information"
+      ).innerHTML = ` ${response.data.username}`;
+    } catch (error) {
+      console.error("Error fetching user information:", error);
+    }
+  } else {
+    document.querySelector(
+      "#information"
+    ).innerHTML = `No user information available.`;
+  }
+}
+
+// Logout user
+async function logout() {
+  localStorage.removeItem("token");
+  alert("Successfully Signed-out!");
+  window.location.href = "/";
 }
