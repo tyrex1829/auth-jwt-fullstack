@@ -12,7 +12,7 @@ app.use(express.static("./public"));
 const JWT_SECRET = "USER_APP";
 
 app.get("/", (req, res) => {
-  res.sendFile("index.html");
+  // res.sendFile("index.html");
 });
 
 app.post("/signing-up", (req, res) => {

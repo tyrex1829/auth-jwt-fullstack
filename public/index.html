@@ -85,6 +85,7 @@
           localStorage.setItem("token", response.data.token);
 
           alert("Signed in successfully!");
+          getUserInformation();
         } catch (error) {
           console.error("Signin error:", error);
         }
@@ -114,10 +115,12 @@
         }
       }
 
-      getUserInformation();
+      // getUserInformation();
 
       async function logout() {
         localStorage.removeItem("token");
+        alert("Successfully Signed-out!");
+        getUserInformation();
       }
     </script>
   </body>
